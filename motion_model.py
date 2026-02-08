@@ -44,7 +44,7 @@ class MotionModel:
         delta_rot_1_hat = delta_rot_1 - np.random.normal(0, math.sqrt(self._alpha1*delta_rot_1**2 + self._alpha2*delta_trans**2))
         delta_trans_hat = delta_trans - np.random.normal(0, math.sqrt(self._alpha3*delta_trans**2 + self._alpha4*(delta_rot_1**2 + delta_rot_2**2)))
         delta_rot_2_hat = delta_rot_2 - np.random.normal(0, math.sqrt(self._alpha1*delta_rot_2**2 + self._alpha2*delta_trans**2))
-        x = x_t0[0] + delta_trans_hat * math.cos(x_t0[2] + delta_rot_1_hat)
-        y = x_t0[1] + delta_trans_hat * math.sin(x_t0[2] + delta_rot_1_hat)
-        theta = x_t0[2] + delta_rot_1_hat + delta_rot_2_hat
+        x = x_t0[0] + delta_trans  * math.cos(x_t0[2] + delta_rot_1)
+        y = x_t0[1] + delta_trans * math.sin(x_t0[2] + delta_rot_1)
+        theta = x_t0[2] + delta_rot_1 + delta_rot_2
         return [x,y,theta]

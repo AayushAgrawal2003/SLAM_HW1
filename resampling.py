@@ -26,18 +26,7 @@ class Resampling:
         """
         TODO : Add your code here
         """
-        X_bar_resampled =  np.zeros_like(X_bar)
-        weights = X_bar[:,3]
-        sum_of_weights = sum(weights) + 1e-8
-        new_weights = weights/sum_of_weights
-        random_number = 0
-        sum_ = 0
-        index = 0
-        for i in range(len(weights)):
-            sum_+=new_weights[i]
-            if sum_>=random_number:
-                index = i
-                break
+        
         
         
 
@@ -52,21 +41,23 @@ class Resampling:
         """
         TODO : Add your code here
         """
-        wt_sum = sum(row[3] for row in X_bar)
+        
         n = len(X_bar) 
-        cumulative_sum = 0
-        r = random.uniform(0,1/n)
-        u = r
-        X_bar = [[a,b,c,d/wt_sum] for a,b,c,d in X_bar]
+        cumulative_sum = X_bar[0][3]
+        r = random.uniform(1e-8,1/n)
+        u_value = r
+        
         X_bar_resampled = []
         num = 0
         for i in range(n):
-            u = r + (i)/n
-            while u > cumulative_sum and num < n:
+            u_value = r + (i)/n
+            
+            while u_value > cumulative_sum and num < n-1:
                 cumulative_sum += X_bar[num][3]
                 num += 1
-            X_bar_resampled.append(X_bar[min(num, n-1)])
-        X_bar_resampled = np.array(X_bar_resampled)
-        X_bar_resampled[:, 3] = 1.0 / n
-
-        return X_bar_resampled
+            X_bar_resampled.append(X_bar[num-1])
+        wt_sum = sum(row[3] for row in X_bar_resampled)
+        X_bar_resampled = [[a,b,c,d/wt_sum] for a,b,c,d in X_bar_resampled]
+        # ipdb.set_trace()
+        
+        return np.array(X_bar_resampled)
