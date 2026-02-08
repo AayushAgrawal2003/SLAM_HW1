@@ -66,6 +66,7 @@ class Resampling:
                 cumulative_sum += X_bar[num][3]
                 num += 1
             X_bar_resampled.append(X_bar[min(num, n-1)])
-        X_bar_resampled = [[a,b,c,d/wt_sum] for a,b,c,d in X_bar_resampled]
-        
-        return np.array(X_bar_resampled)
+        X_bar_resampled = np.array(X_bar_resampled)
+        X_bar_resampled[:, 3] = 1.0 / n
+
+        return X_bar_resampled

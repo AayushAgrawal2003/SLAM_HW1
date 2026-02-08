@@ -93,7 +93,7 @@ if __name__ == '__main__':
     parser.add_argument('--path_to_map', default='../data/map/wean.dat')
     parser.add_argument('--path_to_log', default='../data/log/robotdata1.log')
     parser.add_argument('--output', default='results')
-    parser.add_argument('--num_particles', default=100, type=int)
+    parser.add_argument('--num_particles', default=500, type=int)
     parser.add_argument('--visualize', default=True, action='store_true')
     args = parser.parse_args()
 
@@ -133,8 +133,8 @@ if __name__ == '__main__':
         time_stamp = meas_vals[-1]
 
         # ignore pure odometry measurements for (faster debugging)
-        # if ((time_stamp <= 0.0) | (meas_type == "O")):
-        #     continue
+        if ((time_stamp <= 0.0) | (meas_type == "O")):
+            continue
 
         if (meas_type == "L"):
             # [x, y, theta] coordinates of laser in odometry frame
@@ -171,6 +171,13 @@ if __name__ == '__main__':
                 X_bar_new[m, :] = np.hstack((x_t1, w_t))
             else:
                 X_bar_new[m, :] = np.hstack((x_t1, X_bar[m, 3]))
+
+        # Convert log-weights to proper weights (log-sum-exp trick for numerical stability)
+        log_weights = X_bar_new[:, 3]
+        max_log_w = np.max(log_weights)
+        weights = np.exp(log_weights - max_log_w)
+        weights = weights / np.sum(weights)
+        X_bar_new[:, 3] = weights
 
         X_bar = X_bar_new
         u_t0 = u_t1

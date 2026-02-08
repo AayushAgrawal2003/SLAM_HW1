@@ -35,13 +35,16 @@ class MotionModel:
         """
         TODO : Add your code here
         """
-        delta_rot_1 = math.atan2(u_t1[1] - u_t0[1],u_t1[0] - u_t0[0]) - u_t0[2]
-        delta_trans = ((u_t1[0] - u_t0[0])**2 + (u_t1[1] - u_t0[1])**2)**(0.5)
+        delta_trans = math.sqrt((u_t1[0] - u_t0[0])**2 + (u_t1[1] - u_t0[1])**2)
+        if delta_trans < 0.01:
+            delta_rot_1 = 0.0
+        else:
+            delta_rot_1 = math.atan2(u_t1[1] - u_t0[1], u_t1[0] - u_t0[0]) - u_t0[2]
         delta_rot_2 = u_t1[2] - u_t0[2] - delta_rot_1
-        delta_rot_1_hat = delta_rot_1 - np.random.normal(0,self._alpha1*delta_rot_1**2 + self._alpha2 * delta_trans**2)
-        delta_trans_hat = delta_trans - np.random.normal(0,self._alpha3*delta_trans**2 + self._alpha4*(delta_rot_1**2+delta_rot_2**2))
-        delta_rot_2_hat = delta_rot_2 - np.random.normal(0, self._alpha1*delta_rot_2**2 + self._alpha2*delta_trans**2)
+        delta_rot_1_hat = delta_rot_1 - np.random.normal(0, math.sqrt(self._alpha1*delta_rot_1**2 + self._alpha2*delta_trans**2))
+        delta_trans_hat = delta_trans - np.random.normal(0, math.sqrt(self._alpha3*delta_trans**2 + self._alpha4*(delta_rot_1**2 + delta_rot_2**2)))
+        delta_rot_2_hat = delta_rot_2 - np.random.normal(0, math.sqrt(self._alpha1*delta_rot_2**2 + self._alpha2*delta_trans**2))
         x = x_t0[0] + delta_trans_hat * math.cos(x_t0[2] + delta_rot_1_hat)
         y = x_t0[1] + delta_trans_hat * math.sin(x_t0[2] + delta_rot_1_hat)
-        theta = x_t0[2] + delta_rot_1 + delta_rot_2
+        theta = x_t0[2] + delta_rot_1_hat + delta_rot_2_hat
         return [x,y,theta]
